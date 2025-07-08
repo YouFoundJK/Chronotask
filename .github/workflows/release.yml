@@ -1,0 +1,34 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger this workflow when a tag like v1.0.0 is pushed
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }} # Run on Windows, macOS, and Linux
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest] # The 3 OSes to build on
+
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Use a specific Node.js version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          # GitHub token, automatically provided by the action
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # If you want to release as a draft, set this to true
+          release: true
